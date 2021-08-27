@@ -63,7 +63,13 @@ public class Player : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space))
+        Animator.SetBool("Slide", false);
+        if (Input.GetKey(KeyCode.LeftShift))
+        {
+            Animator.SetBool("Slide", true);
+            Animator.SetBool("DoubleJump", false);
+        }
+        else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space))
         {
             R2D.velocity = new Vector2(R2D.velocity.x, 0);
 
@@ -81,13 +87,6 @@ public class Player : MonoBehaviour
                     Animator.SetBool("Jump", true);
             }
             R2D.AddForce(Vector2.up * Jumpforce);
-        }
-
-        Animator.SetBool("Slide", false);
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            Animator.SetBool("Slide", true);
-            Animator.SetBool("DoubleJump", false);
         }
 
         if (Input.GetKeyDown(KeyCode.LeftControl))

@@ -9,4 +9,9 @@ public class MousePointer : MonoBehaviour
     {
         transform.position = new Vector3(MousePos.x, MousePos.y, transform.position.z);
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        print("Mouse Trigger");
+    }
 }
