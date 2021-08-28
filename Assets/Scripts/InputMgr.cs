@@ -13,6 +13,9 @@ public class InputMgr : MonoBehaviour
     {
         Instance = this;
     }
+    private void Update()
+    {
+    }
 
     public float GetAxisRaw(KeyCode left, KeyCode right)
     {

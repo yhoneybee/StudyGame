@@ -18,6 +18,8 @@ public class Player : MonoBehaviour
     float Speed = 10;
     [SerializeField]
     float Jumpforce = 5;
+    [SerializeField]
+    int JumpCount = 3;
 
     float Dir = 0;
 
@@ -60,6 +62,7 @@ public class Player : MonoBehaviour
                     Animator.SetTrigger("Land");
                 }
                 Animator.SetBool("Jump", false);
+                JumpCount = 3;
             }
         }
 
@@ -69,7 +72,7 @@ public class Player : MonoBehaviour
             Animator.SetBool("Slide", true);
             Animator.SetBool("DoubleJump", false);
         }
-        else if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space))
+        else if (JumpCount > 0 && (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.Space)))
         {
             R2D.velocity = new Vector2(R2D.velocity.x, 0);
 
@@ -87,9 +90,10 @@ public class Player : MonoBehaviour
                     Animator.SetBool("Jump", true);
             }
             R2D.AddForce(Vector2.up * Jumpforce);
+            --JumpCount;
         }
 
-        if (Input.GetKeyDown(KeyCode.LeftControl))
+        if (Input.GetKeyDown(KeyCode.Period))
         {
             ++HP;
         }
@@ -97,7 +101,11 @@ public class Player : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.transform.name == "MousePointer")
+        {
             --HP;
+            if (HP <= 0)
+                Animator.SetTrigger("Die");
+        }
     }
 
     public void Active(int pivot)
