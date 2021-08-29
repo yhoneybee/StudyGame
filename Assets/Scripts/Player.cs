@@ -90,8 +90,11 @@ public class Player : MonoBehaviour
                     Animator.SetBool("Jump", true);
             }
             R2D.AddForce(Vector2.up * Jumpforce);
-            --JumpCount;
+            //--JumpCount;
+            GameMgr.Instance.Score += 10;
         }
+
+        GameMgr.Instance.Score += Time.deltaTime;
 
         if (Input.GetKeyDown(KeyCode.Period))
         {
@@ -104,7 +107,14 @@ public class Player : MonoBehaviour
         {
             --HP;
             if (HP <= 0)
+            {
                 Animator.SetTrigger("Die");
+                StartCoroutine(Delay(2));
+            }
+        }
+        else if (collision.transform.name.Contains("Obstacle"))
+        {
+            GameMgr.Instance.Score += 50;
         }
     }
 
@@ -121,5 +131,14 @@ public class Player : MonoBehaviour
             else
                 HPs[i].SetActive(false);
         }
+    }
+
+    IEnumerator Delay(float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        if (HP <= 0) SceneMgr.Instance.ChangeScene("GameOver");
+
+        yield return null;
     }
 }

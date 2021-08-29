@@ -14,6 +14,8 @@ public class Warning : MonoBehaviour
     [SerializeField]
     TextMeshProUGUI Text;
 
+    Coroutine CTextEffect = null;
+
     private Color normal_color;
     public Color NormalColor
     {
@@ -26,24 +28,17 @@ public class Warning : MonoBehaviour
         }
     }
 
-    public float During;
-    float time;
+    public float During { get; set; }
 
     [SerializeField]
     Image Image;
 
-    private void Start()
-    {
-        time = During;
-        StartCoroutine(ETextEffect());
-        //StartCoroutine(EColorEffect());
-    }
     private void Update()
     {
         if (During < 0)
         {
             ObstacleMgr.Instance.ShotObstacle(Direction, RT.position.y);
-            Destroy(gameObject);
+            ObstacleMgr.ReturnObj(Pool.WARNING, gameObject);
         }
         During -= Time.deltaTime;
     }
@@ -53,6 +48,10 @@ public class Warning : MonoBehaviour
         Direction = direction;
         NormalColor = normal_color;
         During = during;
+
+        if (CTextEffect != null) StopCoroutine(CTextEffect);
+        CTextEffect = StartCoroutine(ETextEffect());
+        //StartCoroutine(EColorEffect());
     }
 
     IEnumerator EColorEffect()

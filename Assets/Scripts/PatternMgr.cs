@@ -19,7 +19,7 @@ class PatternA : IPattern
         for (int i = 0; i < PatternMgr.Instance.YPos.Count; i++)
         {
             ObstacleMgr.Instance.WarningObstacle((i % 2 == 0 ? Direction.RIGHT : Direction.LEFT), PatternMgr.Instance.YPos[i]);
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.1f);
         }
 
         yield return new WaitForSeconds(Random.Range(1.0f, 5.0f));
@@ -49,10 +49,14 @@ class PatternB : IPattern
     }
     IEnumerator Spawn()
     {
-        for (int i = PatternMgr.Instance.YPos.Count - 1; i >= 0; i--)
+        for (int i = 0; i < PatternMgr.Instance.YPos.Count; i++)
         {
-            ObstacleMgr.Instance.WarningObstacle((i % 2 == 1 ? Direction.RIGHT : Direction.LEFT), PatternMgr.Instance.YPos[i]);
-            yield return new WaitForSeconds(0.5f);
+            if (i % 2 == 0)
+            {
+                ObstacleMgr.Instance.WarningObstacle(Direction.RIGHT, PatternMgr.Instance.YPos[i]);
+                ObstacleMgr.Instance.WarningObstacle(Direction.LEFT, PatternMgr.Instance.YPos[Random.Range(0, PatternMgr.Instance.YPos.Count)]);
+                yield return new WaitForSeconds(0.1f);
+            }
         }
 
         yield return new WaitForSeconds(Random.Range(1.0f, 5.0f));
@@ -115,11 +119,10 @@ class PatternD : IPattern
     }
     IEnumerator Spawn()
     {
-        for (int i = 0; i < PatternMgr.Instance.YPos.Count / 2; i++)
+        for (int i = 0; i < 7; i++)
         {
-            ObstacleMgr.Instance.WarningObstacle((i % 2 == 0 ? Direction.RIGHT : Direction.LEFT), PatternMgr.Instance.YPos[i]);
-            ObstacleMgr.Instance.WarningObstacle((i % 2 == 1 ? Direction.RIGHT : Direction.LEFT), PatternMgr.Instance.YPos[Mathf.Abs(i - (PatternMgr.Instance.YPos.Count - 1))]);
-            yield return new WaitForSeconds(0.5f);
+            ObstacleMgr.Instance.WarningObstacle((i % 2 == 1 ? Direction.RIGHT : Direction.LEFT), GameMgr.Instance.player.transform.position.y);
+            yield return new WaitForSeconds(0.1f);
         }
 
         yield return new WaitForSeconds(Random.Range(1.0f, 5.0f));
@@ -149,7 +152,12 @@ class PatternE : IPattern
     }
     IEnumerator Spawn()
     {
-
+        for (int i = 0; i < PatternMgr.Instance.YPos.Count / 2; i++)
+        {
+            ObstacleMgr.Instance.WarningObstacle((i % 2 == 0 ? Direction.RIGHT : Direction.LEFT), PatternMgr.Instance.YPos[i]);
+            ObstacleMgr.Instance.WarningObstacle((i % 2 == 1 ? Direction.RIGHT : Direction.LEFT), PatternMgr.Instance.YPos[Mathf.Abs(i - (PatternMgr.Instance.YPos.Count - 1))]);
+            yield return new WaitForSeconds(0.1f);
+        }
 
         yield return new WaitForSeconds(Random.Range(1.0f, 5.0f));
 
@@ -196,24 +204,12 @@ public class PatternMgr : MonoBehaviour
 
         switch (Random.Range(0, 100))
         {
-            case int i when i < 20:
-                Pattern = A;
-                break;
-            case int i when 20 <= i && i < 40:
-                Pattern = B;
-                break;
-            case int i when 40 <= i && i < 60:
-                Pattern = C;
-                break;
-            case int i when 60 <= i && i < 80:
-                Pattern = D;
-                break;
-            case int i when 80 <= i && i < 100:
-                Pattern = E;
-                break;
+            case int i when i < 20:             Pattern = A; break;
+            case int i when 20 <= i && i < 40:  Pattern = B; break;
+            case int i when 40 <= i && i < 60:  Pattern = C; break;
+            case int i when 60 <= i && i < 80:  Pattern = D; break;
+            case int i when 80 <= i && i < 100: Pattern = E; break;
         }
-
-        Pattern = D;
 
         Execute();
     }

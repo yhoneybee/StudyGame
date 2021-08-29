@@ -10,7 +10,7 @@ public class MousePointer : MonoBehaviour
     Vector3 MousePos => Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
     [SerializeField]
-    private int hp;
+    private int hp = 5;
     public int HP
     {
         get { return hp; }
@@ -30,8 +30,11 @@ public class MousePointer : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-
-        --HP;
+        if (collision.transform.name.Contains("Obstacle"))
+        {
+            --HP;
+            if (HP <= 0) SceneMgr.Instance.ChangeScene("GameOver");
+        }
     }
 
     public void Active(int pivot)

@@ -2,6 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Pool
+{
+    WARNING,
+    OBSTACLE,
+}
+
 public class ObstacleMgr : MonoBehaviour
 {
     public static ObstacleMgr Instance { get; private set; } = null;
@@ -11,6 +17,11 @@ public class ObstacleMgr : MonoBehaviour
 
     [SerializeField]
     Move OriginObstacle;
+
+    List<Queue<GameObject>> pools = new List<Queue<GameObject>>()
+    {
+        new Queue<GameObject>(),new Queue<GameObject>(),
+    };
 
     List<Color> Colors = new List<Color>()
     {
@@ -43,19 +54,63 @@ public class ObstacleMgr : MonoBehaviour
     {
     }
 
+    GameObject CreateObj(Pool poolType)
+    {
+        GameObject obj = null;
+        switch (poolType)
+        {
+            case Pool.WARNING:
+                obj = Instantiate(OriginWarning, Vector3.zero, Quaternion.identity).gameObject;
+                break;
+            case Pool.OBSTACLE:
+                obj = Instantiate(OriginObstacle, Vector3.zero, Quaternion.identity).gameObject;
+                break;
+        }
+        obj.SetActive(false);
+        //obj.transform.SetParent(transform);
+        return obj;
+    }
+    public static GameObject GetObj(Pool poolType)
+    {
+        if (Instance.pools[((int)poolType)].Count > 0)
+        {
+            var obj = Instance.pools[((int)poolType)].Dequeue();
+            obj.SetActive(true);
+            obj.transform.SetParent(null);
+
+            return obj;
+        }
+        else
+        {
+            var obj = Instance.CreateObj(poolType);
+            obj.SetActive(true);
+            obj.transform.SetParent(null);
+
+            return obj;
+        }
+    }
+    public static void ReturnObj(Pool poolType, GameObject obj)
+    {
+        obj.SetActive(false);
+        //obj.transform.SetParent(Instance.transform);
+        Instance.pools[((int)poolType)].Enqueue(obj);
+    }
     public void WarningObstacle(Direction direction, params float[] pos_y)
     {
         for (int i = 0; i < pos_y.Length; i++)
         {
-            var warning = Instantiate(OriginWarning, Vector3.zero, Quaternion.identity);
+            //var warning = Instantiate(OriginWarning, Vector3.zero, Quaternion.identity);
+            var obj = GetObj(Pool.WARNING);
+            var warning = obj.GetComponent<Warning>();
             warning.Setup(direction, Colors[WarningCount++], Random.Range(0.0f, 5.0f));
             warning.transform.SetParent(UIMgr.Instance.Canvas.transform, false);
             warning.RT.position = new Vector2(0, pos_y[i]);
+            warning.RT.localScale = Vector3.one;
         }
-
     }
     public void ShotObstacle(Direction direction, float y)
     {
+        GameObject go;
         Move move = null;
 
         switch (direction)
@@ -65,10 +120,14 @@ public class ObstacleMgr : MonoBehaviour
             case Direction.DOWN:
                 break;
             case Direction.LEFT:
-                move = Instantiate(OriginObstacle, new Vector3(10, y), Quaternion.identity);
+                go = GetObj(Pool.OBSTACLE);
+                move = go.GetComponent<Move>();
+                move.transform.position = new Vector3(10, y);
                 break;
             case Direction.RIGHT:
-                move = Instantiate(OriginObstacle, new Vector3(-10, y), Quaternion.identity);
+                go = GetObj(Pool.OBSTACLE);
+                move = go.GetComponent<Move>();
+                move.transform.position = new Vector3(-10, y);
                 break;
         }
 
